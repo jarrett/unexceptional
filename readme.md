@@ -3,7 +3,11 @@
 Provides a Result class for more elegant, exception-free error handling.
 Especially useful for processing input that could be invalid for many different reasons.
 
-Some examples:
+## API Docs
+
+[http://www.rubydoc.info/github/jarrett/unexceptional/master/Unexceptional/Result](http://www.rubydoc.info/github/jarrett/unexceptional/master/Unexceptional/Result)
+
+## Examples
 
     Result.try(
       ->    { Result.ok 2 },
