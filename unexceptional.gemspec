@@ -7,6 +7,7 @@ Gem::Specification.new do |s|
                    'Especially useful for processing input that could be invalid for many different reasons.'
   s.authors      = ['Jarrett Colby']
   s.email        = 'jarrett@madebyhq.com'
+  s.homepage     = 'https://github.com/jarrett/unexceptional'
   s.files        = Dir.glob('lib/**/*')
   s.license      = 'MIT'
   
