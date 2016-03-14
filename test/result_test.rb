@@ -34,13 +34,30 @@ class ResultTest < Minitest::Test
     )
     assert_equal 3, result.unwrap
     
-    # Set.
+    # Setting locals.
     result = Result.try(
-      -> { set :a, Result.ok(2) },
+      -> { set :a, Result.ok(2); },
       -> { set :b, Result.ok(@a * 3) },
       -> { set :c, Result.err(@b * 4) },
       -> { set :d, Result.ok(@c * 5) }
     )
+    assert result.err?
+    refute result.ok?
+    assert_equal 24, result.err
+    
+    # Setting locals with an object that already has a #set method.
+    o = MetaclassExample.new
+    result = nil
+    assert_equal :before, o.set
+    o.instance_eval do
+      result = Result.try(
+        -> { set :a, Result.ok(2); },
+        -> { set :b, Result.ok(@a * 3) },
+        -> { set :c, Result.err(@b * 4) },
+        -> { set :d, Result.ok(@c * 5) }
+      )
+    end
+    assert_equal :before, o.set
     assert result.err?
     refute result.ok?
     assert_equal 24, result.err
@@ -98,5 +115,28 @@ class ResultTest < Minitest::Test
     assert result.err?
     refute result.ok?
     assert_equal 'Uh-oh', result.err
+  end
+  
+  # Verifies that we can manipulate metaclasses as we expect.
+  def test_metaclass
+    o = MetaclassExample.new
+    assert_equal :before, o.set
+    class << o
+      alias_method :__set_before_try, :set
+      def set
+        :after
+      end
+    end
+    assert_equal :after, o.set
+    class << o
+      alias_method :set, :__set_before_try
+    end
+    assert_equal :before, o.set
+  end
+  
+  class MetaclassExample
+    def set
+      :before
+    end
   end
 end

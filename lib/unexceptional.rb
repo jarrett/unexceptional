@@ -104,25 +104,57 @@ module Unexceptional
     #       -> { Result.ok(@b * 4) }
     #     )
     #     # => Result.ok(24)
+    # 
+    # This defines `#set` on whatever object is currently `self`. If `#set` was previously
+    # defined, it'll be temporarily overwritten.
     def self.try(*procs)
       if procs.empty?
         raise 'Must past at least one proc to Result.try'
       end
-      ctx = TryContext.new
       procs.inject(nil) do |last_result, proc|
+        # Ruby 2.2 introduced Binding#receiver. But to support Ruby <= 2.1, we use eval.
+        ctx = proc.binding.eval('self')
+        
+        # Extend ctx's metaclass with the #set method, saving the previous #set if any.
+        class << ctx
+          if method_defined? :set
+            alias_method :__set_before_try, :set
+          end
+          
+          def set(var, result)
+            if result.ok?
+              instance_variable_set '@' + var.to_s, result.unwrap
+            end
+            result
+          end
+        end
+        
+        # Maybe call the proc, maybe with arguments.
         if last_result.nil?
-          ctx.instance_exec(&proc)
+          result = proc.call
         elsif !last_result.is_a?(Result)
           raise "Each proc in Result.try must return a Result, but proc returned #{last_result.inspect}"
         elsif last_result.ok?
           if proc.parameters.length == 0
-            ctx.instance_exec(&proc)
+            result = proc.call
           else
-            ctx.instance_exec(last_result.unwrap, &proc)
+            result = proc.call last_result.unwrap
           end
         else
-          last_result
+          result = last_result
         end
+        
+        # Undo the changes to ctx's metaclass.
+        class << ctx
+          if method_defined? :__set_before_try
+            alias_method :set, :__set_before_try
+          else
+            remove_method :set
+          end
+        end
+        
+        # Return the result of the current proc.
+        result
       end
     end
     
@@ -212,15 +244,5 @@ module Unexceptional
       end
     end
     alias_method :ok, :unwrap
-  end
-  
-  # @private
-  class TryContext
-    def set(var, result)
-      if result.ok?
-        instance_variable_set '@' + var.to_s, result.unwrap
-      end
-      result
-    end
   end
 end
