@@ -99,8 +99,8 @@ module Unexceptional
     # `#set` method along with instance variables:
     # 
     #     Result.try(
-    #       -> { @a = Result.ok 2 },
-    #       -> { @b = Result.ok @a * 3 },
+    #       -> { set :a, Result.ok(2) },
+    #       -> { set :b, Result.ok(@a * 3) },
     #       -> { Result.ok(@b * 4) }
     #     )
     #     # => Result.ok(24)
