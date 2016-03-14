@@ -73,26 +73,26 @@ module Unexceptional
     # return a `Result`--either ok or err. Aborts on the first err, if any, returning the
     # failed `Result`. If all procs return ok, returns the last `Result`.
     # 
-    #    Result.try(
-    #      ->    { Result.ok 2 },
-    #      ->(i) { Result.ok 3 * i }
-    #    )
-    #    # => Result.ok(6)
-    #    
-    #    Result.try(
-    #      ->    { Result.ok 2 },
-    #      ->(_) { Result.err :uh_oh },
-    #      ->(i) { Result.ok 3 * i }
-    #    )
-    #    # => Result.err(:uh_oh)
+    #     Result.try(
+    #       ->    { Result.ok 2 },
+    #       ->(i) { Result.ok 3 * i }
+    #     )
+    #     # => Result.ok(6)
+    #     
+    #     Result.try(
+    #       ->    { Result.ok 2 },
+    #       ->(_) { Result.err :uh_oh },
+    #       ->(i) { Result.ok 3 * i }
+    #     )
+    #     # => Result.err(:uh_oh)
     # 
     # You can also pass tuples through and pattern-match:
     # 
-    #    Result.try(
-    #      ->         { Result.ok [1, 2] },
-    #      ->((a, b)) { Result.ok a + b }
-    #    )
-    #    # => Result.ok(3)
+    #     Result.try(
+    #       ->         { Result.ok [1, 2] },
+    #       ->((a, b)) { Result.ok a + b }
+    #     )
+    #     # => Result.ok(3)
     # 
     # If you need to initialize a lot of objects along the way, passing them through the
     # various procs via pattern-matching can be unwieldy. In that case, you can use the
