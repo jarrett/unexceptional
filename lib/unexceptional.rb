@@ -214,7 +214,8 @@ module Unexceptional
     alias_method :ok, :unwrap
   end
   
-  class TryContext #:nodoc:
+  # @private
+  class TryContext
     def set(var, result)
       if result.ok?
         instance_variable_set '@' + var.to_s, result.unwrap
