@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name         = 'unexceptional'
-  s.version      = '0.0.0'
+  s.version      = '0.0.1'
   s.date         = Time.now.strftime('%Y-%m-%d')
   s.summary      = 'Unexceptional'
   s.description  = 'Provides a Result class for more elegant, exception-free error handling. ' +
