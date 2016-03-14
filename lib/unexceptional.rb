@@ -93,20 +93,32 @@ module Unexceptional
     #      ->((a, b)) { Result.ok a + b }
     #    )
     #    # => Result.ok(3)
+    # 
+    # If you need to initialize a lot of objects along the way, passing them through the
+    # various procs via pattern-matching can be unwieldy. In that case, you can use the
+    # `#set` method along with instance variables:
+    # 
+    #     Result.try(
+    #       -> { @a = Result.ok 2 },
+    #       -> { @b = Result.ok @a * 3 },
+    #       -> { Result.ok(@b * 4) }
+    #     )
+    #     # => Result.ok(24)
     def self.try(*procs)
       if procs.empty?
         raise 'Must past at least one proc to Result.try'
       end
+      ctx = TryContext.new
       procs.inject(nil) do |last_result, proc|
         if last_result.nil?
-          proc.call
+          ctx.instance_exec(&proc)
         elsif !last_result.is_a?(Result)
           raise "Each proc in Result.try must return a Result, but proc returned #{last_result.inspect}"
         elsif last_result.ok?
           if proc.parameters.length == 0
-            proc.call
+            ctx.instance_exec(&proc)
           else
-            proc.call last_result.unwrap
+            ctx.instance_exec(last_result.unwrap, &proc)
           end
         else
           last_result
@@ -200,5 +212,14 @@ module Unexceptional
       end
     end
     alias_method :ok, :unwrap
+  end
+  
+  class TryContext #:nodoc:
+    def set(var, result)
+      if result.ok?
+        instance_variable_set '@' + var.to_s, result.unwrap
+      end
+      result
+    end
   end
 end

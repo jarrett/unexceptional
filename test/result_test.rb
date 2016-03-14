@@ -33,6 +33,17 @@ class ResultTest < Minitest::Test
       ->((a, b)) { Result.ok a + b }
     )
     assert_equal 3, result.unwrap
+    
+    # Set.
+    result = Result.try(
+      -> { set :a, Result.ok(2) },
+      -> { set :b, Result.ok(@a * 3) },
+      -> { set :c, Result.err(@b * 4) },
+      -> { set :d, Result.ok(@c * 5) }
+    )
+    assert result.err?
+    refute result.ok?
+    assert_equal 24, result.err
   end
   
   def test_map_while
