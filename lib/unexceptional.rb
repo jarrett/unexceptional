@@ -1,21 +1,21 @@
 module Unexceptional
   class Result
-    # Pass true or false and an error value. If the first argument is true, returns an ok
-    # Result. If the first argument is false, returns an err Result wrapping the error
-    # value.
+    # Pass true or false and an error value. If the first argument is `true`, returns an
+    # ok `Result`. If the first argument is false, returns an err `Result` wrapping the
+    # error value.
     def self.check(condition, error)
       condition ? ok : err(error)
     end
   
-    # Returns a new Result respresenting failure. Optionally pass a wrapped result value.
+    # Returns a new `Result` respresenting failure. Accepts an optional error value.
     def self.err(err)
       new false, nil, err
     end
   
     # Pass a block and a collection. The block must accept a member of the collection and
-    # return a Result.
+    # return a `Result`.
     # 
-    # If all members succeed, returns a Result wrapping all the mapped members:
+    # If all members succeed, returns a `Result` wrapping all the mapped members:
     #
     #     Result.map([1, 2]) do |i|
     #       Result.ok i * 2
@@ -47,14 +47,14 @@ module Unexceptional
       )
     end
     
-    # Returns a new Result respresenting success. Optionally pass a wrapped result value.
+    # Returns a new `Result` respresenting success. Accepts an optional result value.
     def self.ok(val = nil)
       new true, val, nil
     end
   
-    # Given a block, runs an ActiveRecord transaction. The block must return a Result. If
-    # the Result is an error, rolls back the transaction. Either way, returns the Result.
-    # You must call `require 'active_record` before you call this method.
+    # Given a block, runs an ActiveRecord transaction. The block must return a `Result`.
+    # If the `Result` is an error, rolls back the transaction. Either way, returns the
+    # `Result`. You must call `require 'active_record'` before you call this method.
     def self.transaction
       unless defined?(ActiveRecord)
         raise 'ActiveRecord is not defined'
@@ -70,8 +70,8 @@ module Unexceptional
     end
     
     # Tries to run a list of procs, aborting on the first failure, if any. Each proc must
-    # return a Result--either ok or err. Aborts on the first err, if any, returning the
-    # failed Result. If all procs return ok, returns the last Result.
+    # return a `Result`--either ok or err. Aborts on the first err, if any, returning the
+    # failed `Result`. If all procs return ok, returns the last `Result`.
     # 
     #    Result.try(
     #      ->    { Result.ok 2 },
@@ -100,6 +100,8 @@ module Unexceptional
       procs.inject(nil) do |last_result, proc|
         if last_result.nil?
           proc.call
+        elsif !last_result.is_a?(Result)
+          raise "Each proc in Result.try must return a Result, but proc returned #{last_result.inspect}"
         elsif last_result.ok?
           if proc.parameters.length == 0
             proc.call
@@ -112,14 +114,14 @@ module Unexceptional
       end
     end
     
-    # If this Result is an err, returns self:
+    # If this `Result` is an err, returns self:
     #
     #     Result
     #       .err(:uh_oh)
     #       .and_then { 'This block never executes' }
     #     # => Result.err(:uh_oh)
     # 
-    # If this Result is ok, then the behavior depends on what you passed to `and_then`:
+    # If this `Result` is ok, then the behavior depends on what you passed to `and_then`:
     # 
     #     # Passing a single argument:
     #     Result
@@ -152,19 +154,19 @@ module Unexceptional
       end
     end
     
-    # Yields this Result if this Result is an err.
+    # Yields this `Result` if this `Result` is an err.
     def if_err
       yield self.err if !@ok
       self
     end
     
-    # Yields this Result if this Result is ok.
+    # Yields this `Result` if this Result is ok.
     def if_ok
       yield self.val if @ok
       self
     end
     
-    # Returns the wrapped err value. Raises if this Result is ok.
+    # Returns the inner err value. Raises if this `Result` is ok.
     def err
       if !@ok
         @err
@@ -183,13 +185,13 @@ module Unexceptional
       @val = val
       @err = err
     end
-  
+    
     # Returns true if this Result is ok, false if this Result is an err.
     def ok?
       @ok
     end
     
-    # Returns the wrapped success value. Raises if this Result is an err.
+    # Returns the inner success value. Raises if this Result is an err.
     def unwrap
       if @ok
         @val
@@ -197,5 +199,6 @@ module Unexceptional
         raise "Called #unwrap on error: #{@err.inspect}"
       end
     end
+    alias_method :ok, :unwrap
   end
 end
