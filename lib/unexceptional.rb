@@ -17,14 +17,14 @@ module Unexceptional
     # 
     # If all members succeed, returns a `Result` wrapping all the mapped members:
     #
-    #     Result.map([1, 2]) do |i|
+    #     Result.map_while([1, 2]) do |i|
     #       Result.ok i * 2
     #     end
     #     # => Result.ok([1, 2])
     # 
     # Aborts on the first failure:
     #
-    #     Result.map([1, 2, 3]) do |i|
+    #     Result.map_while([1, 2, 3]) do |i|
     #       if i == 2
     #         Result.err '2 is invalid'
     #       elsif i == 3
