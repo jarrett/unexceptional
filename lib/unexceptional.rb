@@ -20,7 +20,7 @@ module Unexceptional
     #     Result.map_while([1, 2]) do |i|
     #       Result.ok i * 2
     #     end
-    #     # => Result.ok([1, 2])
+    #     # => Result.ok([2, 4])
     # 
     # Aborts on the first failure:
     #
