@@ -39,7 +39,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord (~> 5)
+  activerecord
   minitest (~> 5)
   minitest-reporters (~> 1)
   rake

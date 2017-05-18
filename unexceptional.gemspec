@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   
   s.add_development_dependency 'minitest', '~> 5'
   s.add_development_dependency 'minitest-reporters', '~> 1'
-  s.add_development_dependency 'activerecord', '~> 5'
+  s.add_development_dependency 'activerecord'
   s.add_development_dependency 'sqlite3', '~> 1'
   s.add_development_dependency 'rake'
 end
