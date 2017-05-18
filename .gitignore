@@ -15,6 +15,7 @@
 .*
 !.gitignore
 !.gitkeep
+!.travis.yml
 *~
 
 # KDE
