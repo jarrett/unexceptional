@@ -21,7 +21,7 @@ GEM
     arel (8.0.0)
     builder (3.2.3)
     concurrent-ruby (1.0.5)
-    i18n (0.8.1)
+    i18n (0.8.4)
     minitest (5.10.2)
     minitest-reporters (1.1.14)
       ansi
@@ -47,4 +47,4 @@ DEPENDENCIES
   unexceptional!
 
 BUNDLED WITH
-   1.13.6
+   1.15.1
